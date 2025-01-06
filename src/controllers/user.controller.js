@@ -4,7 +4,6 @@ import {ApiResponse} from "../utils/ApiResponse.js";
 import { User } from "../models/user.models.js";
 import {Submission} from "../models/submission.models.js"
 import mongoose from "mongoose";
-import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
 import jwt  from "jsonwebtoken";
 
