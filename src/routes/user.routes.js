@@ -11,5 +11,6 @@ router.route("/update-details").post(verifyJWT , updateDetails);
 router.route("/get-details/:slug").get(verifyJWT ,getUserDashboard);
 router.route("/get-users").get(verifyJWT ,getUsers);
 router.route("/current-user").get(verifyJWT ,getCurrentUser);
+router.route("/check-status").get((req , res) => {res.status(200).json({server : "it is working properly"})});
 
 export default router
