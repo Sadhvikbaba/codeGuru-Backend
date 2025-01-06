@@ -214,14 +214,13 @@ const getStarted = asyncHandler(async (req, res) => {
 
     let userEmail, userFullName, avatar, userName, googleId, githubId;
 
-    // Handle OAuth providers: Google or GitHub
+    
     if (provider === 'google') {
         if (!token) {
             throw new ApiError(400, 'Token is required for Google login');
         }
 
         try {
-            // Fetch user info from Google OAuth2 endpoint using axios
             const { data } = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -232,12 +231,11 @@ const getStarted = asyncHandler(async (req, res) => {
                 throw new ApiError(500, 'Failed to retrieve user data from Google');
             }
 
-            // Extract user details
             userEmail = data.email;
             userFullName = data.name;
             avatar = data.picture;
             userName = userFullName.split(' ').join('').toLowerCase();
-            googleId = data.sub; // Unique Google user ID
+            googleId = data.sub; 
         } catch (error) {
             console.error('Error during Google OAuth:', error.message || error.response?.data || error);
             throw new ApiError(500, 'Failed to authenticate with Google');
@@ -247,7 +245,7 @@ const getStarted = asyncHandler(async (req, res) => {
             throw new ApiError(400, 'Authorization code is required for GitHub login');
         }
         try {
-            // Exchange GitHub code for an access token
+            
             const githubTokenResponse = await axios.post(
                 'https://github.com/login/oauth/access_token',
                 {
@@ -261,7 +259,6 @@ const getStarted = asyncHandler(async (req, res) => {
             const githubAccessToken = githubTokenResponse.data.access_token;
             if(!githubAccessToken) throw new ApiError(400 , "wrong token")
 
-            // Fetch user details from GitHub
             const githubUserResponse = await axios.get('https://api.github.com/user', {
                 headers: { Authorization: `Bearer ${githubAccessToken}` },
             });
@@ -271,7 +268,7 @@ const getStarted = asyncHandler(async (req, res) => {
             userFullName = githubUser.name || githubUser.login;
             avatar = githubUser.avatar_url;
             userName = githubUser.login.toLowerCase();
-            githubId = githubUser.id; // Unique GitHub user ID
+            githubId = githubUser.id; 
         } catch (error) {
             throw new ApiError(500, 'Failed to authenticate with GitHub');
         }
@@ -286,11 +283,10 @@ const getStarted = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'Unsupported provider');
     }
 
-    // Check if user exists
+    
     let user = await User.findOne({ email: userEmail });
 
     if (user) {
-        // If user exists, update provider-specific IDs if applicable
         if (provider === 'google' && !user.googleId) {
             user.googleId = googleId;
         }
@@ -299,7 +295,6 @@ const getStarted = asyncHandler(async (req, res) => {
         }
         await user.save();
     } else {
-        // If user does not exist, create a new user
         if (provider === 'normal' && !password) {
             throw new ApiError(400, 'Password is required for normal signup');
         }
@@ -309,13 +304,13 @@ const getStarted = asyncHandler(async (req, res) => {
             fullName: userFullName,
             email: userEmail,
             avatar: avatar || '',
-            password: provider === 'normal' ? password : null, // Only set password for normal login
+            password: provider === 'normal' ? password : null, 
             googleId: provider === 'google' ? googleId : null,
             githubId: provider === 'github' ? githubId : null,
         });
     }
 
-    // Generate tokens
+
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
     const userResponse = await User.findById(user._id).select('-password -refreshToken -OTP -googleId -githubId');

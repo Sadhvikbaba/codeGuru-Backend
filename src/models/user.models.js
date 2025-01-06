@@ -29,10 +29,9 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
-    // Password is optional for OAuth users
     password: {
       type: String,
-      default: null, // null for OAuth users
+      default: null, 
     },
     googleId: {
       type: String,
@@ -63,17 +62,15 @@ const userSchema = new Schema(
 
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password") || !this.password) return next(); // Skip if no password
+  if (!this.isModified("password") || !this.password) return next(); 
   this.password = await bcryptjs.hash(this.password, 10);
   next();
 });
 
-// Method to compare passwords
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcryptjs.compare(password, this.password);
 };
 
-// Generate Access Token
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
@@ -89,7 +86,6 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-// Generate Refresh Token
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {

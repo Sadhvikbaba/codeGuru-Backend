@@ -159,7 +159,7 @@ export const getQuestionById = asyncHandler(async (req, res) => {
             },
             {
                 $addFields: {
-                    user: { $arrayElemAt: ["$user", 0] }, // Ensures only the first user object is returned
+                    user: { $arrayElemAt: ["$user", 0] }, 
                 },
             },
         ]),
