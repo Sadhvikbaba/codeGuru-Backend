@@ -61,7 +61,10 @@ export const compileCode = asyncHandler(async (req, res) => {
         const user = await User.findById(userId);
         if (!user) throw new Error("User not found");
 
-        const updatedHistory = [...new Set([slug, ...(user.solved || [])])];
+        let solved = user.solved || [] ;
+
+        const updatedHistory = solved.filter((item, pos) => solved.indexOf(item) === pos);
+        
         await User.findByIdAndUpdate(userId, { $set: { solved: updatedHistory } }, { new: true });
         await Question.findByIdAndUpdate(slug, { $inc: { acceptedSubmissions: 1 } });
 
