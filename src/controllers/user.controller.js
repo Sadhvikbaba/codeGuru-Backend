@@ -310,6 +310,14 @@ const getStarted = asyncHandler(async (req, res) => {
         });
     }
 
+    if(provider == "normal"){
+        const user = await User.findOne({email})
+        
+        const isPasswordValid = await user.isPasswordCorrect(password);
+
+        if(!isPasswordValid) throw new ApiError(400 , "incorrect password");
+    }
+
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
