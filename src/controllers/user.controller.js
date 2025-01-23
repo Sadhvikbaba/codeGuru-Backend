@@ -172,7 +172,8 @@ const getUserDashboard = asyncHandler(async (req , res) => {
             },{
                 $project : {
                     updatedAt : 1,
-                    question : 1
+                    question : 1,
+                    language : 1
                 }
             },{$addFields : {question : {$first : "$question"}}}]
         }},
